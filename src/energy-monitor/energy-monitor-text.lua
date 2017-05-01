@@ -90,7 +90,7 @@ function init ()
   address = rfStorageLookup (storageName)
   if address == nil then
     print ("Couldn't found required component address, exiting...")
-    return nil
+    return nil, gpu
   end
 
   if debug then
@@ -100,11 +100,14 @@ function init ()
   end
 
   print ("Starting up!, gathering initial values...")
-  return address
+  return address, gpu
 end
 
 function run ()
-  local address = init ()
+  local address, gpu = init ()
+  if address == nil then
+    return
+  end
 
   local coreProxy = component.proxy(address)
   local lastEnergy = coreProxy.getEnergyStored()
