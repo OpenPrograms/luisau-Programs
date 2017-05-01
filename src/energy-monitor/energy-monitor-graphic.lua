@@ -67,6 +67,7 @@ end
 
 function run ()
 	local gpu = term.gpu()
+	gpu.setResolution(80, 25)
 	local address = rfStorageLookup (storageName)
 	local coreProxy = component.proxy(address)
 	local lastEnergy = coreProxy.getEnergyStored()
@@ -74,18 +75,18 @@ function run ()
 	term.clear()
 	os.sleep (step)
 	while true do
-		term.setCursor(2, 2)
+		term.setCursor(2, 1)
 		term.clearLine()
-		term.setCursor(2, 2)
+		term.setCursor(2, 1)
 
 		currentEnergy = coreProxy.getEnergyStored()
 		local percent = currentEnergy / maxEnergy * 100.0
 		term.write("Energy Core (RF): " .. formatNumber(currentEnergy) .. " / " .. formatNumber(maxEnergy) .. "  (" .. string.format("%.2f", percent) .. "%)")
 		
 		local energyChange = (currentEnergy - lastEnergy) / (20 * step)
-		term.setCursor(2, 3)
+		term.setCursor(2, 2)
 		term.clearLine()
-		term.setCursor(2, 3)
+		term.setCursor(2, 2)
 		if energyChange >= 0 then
 			gpu.setForeground(0x00FF00)
 		else
