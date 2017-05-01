@@ -69,21 +69,18 @@ function printCoreValuesRaw (core)
 end
 
 function rfStorageLookup (storageName)
-  local addressFound = nil
   print ("Trying to lookup address for " .. storageName .. "...")
   for address, componentName in component.list() do
     if componentName == storageName then
       print (storageName .. " found at address: "..address)
-      addressFound = address
+      print ("------------------------------------------")
+      return address
       break
     end
   end
-  if addressFound == nil then
-    print ("Address not found for " .. storageName)
-  end
+  print ("Address lookup failed for component "..storageName)
   print ("------------------------------------------")
   print()
-  return addressFound
 end
 
 function resetScreen (mode)
