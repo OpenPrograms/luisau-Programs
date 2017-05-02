@@ -1,26 +1,24 @@
---[[
-  oc-energy-monitor v0.1 by luisau
-  OpenComputers program to monitor a single
-  Draconic Evolution Energy Core.
-
-  Requirements:
-    - Place an Adapter Block in contact with one of your Energy Pylons
-    - Connect the Adapter Block through cables to the computer
-    - Only tested with tier 3 computers.
-  Install:
-    oppm install oc-energy-monitor
-  Executables:
-    energy-monitor-text     Text only monitor.
-    energy-monitor-graphic  Graphic histogram version.
-  Feedback:
-    Contact me through Discord app.
-  Repository:
-    https://github.com/lpenap/oc-energy-monitor
-]]
+--------------------------------------------------------------------------------
+-- energy-monitor v0.1 by luisau
+-- OpenComputers program to monitor a single Draconic Evolution Energy Core.
+--
+-- Requirements:
+--    - Place an Adapter Block in contact with one of your Energy Pylons
+--    - Connect the Adapter Block through cables to the computer
+--    - Only tested with tier 3 computers.
+-- Install:
+--    oppm install energy-monitor
+-- Feedback:
+--    Contact me through Discord app: luisau#0826
+-- Repository:
+--    https://github.com/lpenap/oc-energy-monitor
+--------------------------------------------------------------------------------
 
 require("energy-monitor-lib")
 
--- Configuration -----------------------------------------------------
+--------------------------------------------------------------------------------
+-- Configuration
+--------------------------------------------------------------------------------
 
 -- step: run interval in seconds.
 local step = 1
@@ -28,12 +26,15 @@ local step = 1
 -- debug: print aditional debug info (usually at start).
 local debug = true
 
--- Constants ---------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Constants
+--------------------------------------------------------------------------------
 local storageName = "draconic_rf_storage"
 local initDelay = 10
 
--- Functions ---------------------------------------------------------
-
+--------------------------------------------------------------------------------
+-- Prints the current energy values
+--------------------------------------------------------------------------------
 function printEnergy (core, term)
   term.setCursor(2, 1)
   term.clearLine()
@@ -44,6 +45,9 @@ function printEnergy (core, term)
     string.format("%.2f", core:getLastPercentStored()) .. "%)")
 end
 
+--------------------------------------------------------------------------------
+-- Prints the change on energy levels
+--------------------------------------------------------------------------------
 function printEnergyChange (change, term)
   term.setCursor(2, 2)
   term.clearLine()
@@ -58,6 +62,9 @@ function printEnergyChange (change, term)
   gpu.setForeground(0xFFFFFF)
 end
 
+--------------------------------------------------------------------------------
+-- Updates values on screen continuously (until interrupted)
+--------------------------------------------------------------------------------
 function run ()
   local core, term, component =
     init (storageName, "text", debug, initDelay)
@@ -77,7 +84,9 @@ function run ()
 end
 
 
--- Main Program ------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Main Program
+--------------------------------------------------------------------------------
 local exitCode = run ()
 if exitCode ~= 0 then
   print ("An internal error occurred. Exit code ".. exitCode)
