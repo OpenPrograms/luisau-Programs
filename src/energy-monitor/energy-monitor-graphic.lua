@@ -26,6 +26,9 @@ local step = 1
 -- debug: print aditional debug info (usually at start).
 local debug = true
 
+-- name: Name of your Energy Core
+local name = "Energy Core"
+
 --------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
@@ -36,22 +39,42 @@ local initDelay = 10
 -- Prints the current energy values
 --------------------------------------------------------------------------------
 function printEnergy (core, term)
-  term.setCursor(2, 1)
+  local gpu = term.gpu()
+  local w, h = gpu.getResolution()
+  local startX = 1
+  local startY = 1
+  term.setCursor(startX, startY)
   term.clearLine()
-  term.setCursor(2, 1)
-  term.write("Energy Core (RF): " ..
-    formatNumber(core:getLastEnergyStored()) .. " / " ..
-    formatNumber(core:getMaxEnergyStored()) .. "   (" ..
-    string.format("%.2f", core:getLastPercentStored()) .. "%)")
+  term.setCursor(startX, startY)
+  term.write (name .." [energy-monitor v0.1]")
+  gpu.setBackground(0xFF0000)
+  gpu.fill (startX, startY+1, w, 3, " ")
+  local currentWidth = math.ceil (core:getLastPercentStored() * w / 100)
+  gpu.setForeground(0x000000)
+  if currentWith < (w - 10) then
+    term.setCursor(currentWidth+2, startY+2)
+  else
+    term.setCursor(w - 10, startY+2)
+  end
+  term.write (string.format("%.2f", core:getLastPercentStored()) .. "%")
+
+  gpu.setBackground(0x00FF00)
+  gpu.fill (startX, startY+1, currentWidth, 3, " ")
+
+  gpu.setBackground(0x000000)
+  gpu.setForeground(0xFFFFFF)
+  term.setCursor (startX, startY+4)
+  term.write (formatNumber(core:getLastEnergyStored()) .. " / " ..
+    formatNumber(core:getMaxEnergyStored()))
 end
 
 --------------------------------------------------------------------------------
 -- Prints the change on energy levels
 --------------------------------------------------------------------------------
 function printEnergyChange (change, term)
-  term.setCursor(2, 2)
+  term.setCursor(2, 10)
   term.clearLine()
-  term.setCursor(2, 2)
+  term.setCursor(2, 10)
   local gpu = term.gpu()
   if change >= 0 then
     gpu.setForeground(0x00FF00)
