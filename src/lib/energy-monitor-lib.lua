@@ -94,7 +94,7 @@ function resetScreen (mode)
   local maxW, maxH = gpu.maxResolution()
 
   if mode == "text" then
-    gpu.setResolution(math.max(80, maxW), math.max(25, maxH))
+    gpu.setResolution(math.min(80, maxW), math.min(25, maxH))
   else
     -- set max res and depth for graphic mode
     local gpu = term.gpu()
