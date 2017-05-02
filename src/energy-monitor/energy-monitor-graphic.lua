@@ -33,7 +33,7 @@ local name = "Energy Core"
 -- Constants
 --------------------------------------------------------------------------------
 local storageName = "draconic_rf_storage"
-local initDelay = 10
+local initDelay = 1
 
 --------------------------------------------------------------------------------
 -- Prints the current energy values
@@ -41,6 +41,7 @@ local initDelay = 10
 function printEnergy (core, term)
   local gpu = term.gpu()
   local w, h = gpu.getResolution()
+  gpu.fill(1,1,w,h, " ")
   local startX = 1
   local startY = 1
   term.setCursor(startX, startY)
@@ -50,16 +51,23 @@ function printEnergy (core, term)
   gpu.setBackground(0xFF0000)
   gpu.fill (startX, startY+1, w, 3, " ")
   local currentWidth = math.ceil (core:getLastPercentStored() * w / 100)
-  gpu.setForeground(0x000000)
-  if currentWith < (w - 10) then
-    term.setCursor(currentWidth+2, startY+2)
-  else
-    term.setCursor(w - 10, startY+2)
-  end
-  term.write (string.format("%.2f", core:getLastPercentStored()) .. "%")
 
   gpu.setBackground(0x00FF00)
   gpu.fill (startX, startY+1, currentWidth, 3, " ")
+
+  gpu.setForeground(0x000000)
+  if currentWidth < (w - 10) then
+    gpu.setBackground(0xFF0000)
+    term.setCursor(currentWidth+2, startY+2)
+  else
+    gpu.setBackground(0x00FF00)
+    term.setCursor(w - 16, startY+2)
+  end
+  term.write (string.format("%.2f", core:getLastPercentStored()) .. "%")
+
+  --  gpu.setBackground(0x00FF00)
+  --  gpu.fill (startX, startY+1, currentWidth, 3, " ")
+
 
   gpu.setBackground(0x000000)
   gpu.setForeground(0xFFFFFF)
@@ -114,4 +122,3 @@ local exitCode = run ()
 if exitCode ~= 0 then
   print ("An internal error occurred. Exit code ".. exitCode)
 end
-
