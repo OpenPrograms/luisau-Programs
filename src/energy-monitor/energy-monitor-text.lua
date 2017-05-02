@@ -39,9 +39,9 @@ function printEnergy (core, term)
   term.clearLine()
   term.setCursor(2, 1)
   term.write("Energy Core (RF): " ..
-    formatNumber(core.getLastEnergyStored()) .. " / " ..
-    formatNumber(core.getMaxEnergyStored()) .. "   (" ..
-    string.format("%.2f", core.getLastPercentStored()) .. "%)")
+    formatNumber(core:getLastEnergyStored()) .. " / " ..
+    formatNumber(core:getMaxEnergyStored()) .. "   (" ..
+    string.format("%.2f", core:getLastPercentStored()) .. "%)")
 end
 
 function printEnergyChange (change, term)
@@ -69,7 +69,7 @@ function run ()
   term.clear()
   os.sleep (step)
   while true do
-    local energyChange = core.getEnergyChange()
+    local energyChange = core:getEnergyChange()
     printEnergy (core, term)
     printEnergyChange (energyChange, term)
     os.sleep(step)

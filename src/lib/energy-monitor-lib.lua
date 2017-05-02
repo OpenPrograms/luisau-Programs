@@ -1,16 +1,16 @@
 local component = require("component")
 local term = require ("term")
 
-EnergyCore = {}
-EnergyCore.__index = EnergyCore
+EnergyCore = {proxy = nil, lastTicks = 0, lastEnergyStored = 0, percent = 0}
 
-function EnergyCore:create(coreProxy)
-  local _core ={}
-  setmetatable (_core, EnergyCore)
-  _core.proxy = coreProxy
-  _core.lastTicks = getCurrentTicks ()
-  _core.lastEnergyStored = coreProxy.getEnergyStored()
-  _core.percent = _core.lastEnergyStored / coreProxy.getMaxEnergyStored() * 100.0
+function EnergyCore:create(address)
+  _core ={}
+  setmetatable (_core, self)
+  self.__index = self
+  self.proxy = component.proxy(address)
+  self.lastTicks = getCurrentTicks ()
+  self.lastEnergyStored = self.proxy.getEnergyStored()
+  self.percent = self.lastEnergyStored / self.proxy.getMaxEnergyStored() * 100.0
   return _core
 end
 
@@ -62,8 +62,8 @@ function printComponentList ()
 end
 
 function printCoreValuesRaw (core)
-  print ("MaxEnergyStored (RF raw) ".. core.getMaxEnergyStored())
-  print ("    EnergyStore (RF raw) ".. core.getEnergyStored())
+  print ("MaxEnergyStored (RF raw) ".. core:getMaxEnergyStored())
+  print ("    EnergyStore (RF raw) ".. core:getEnergyStored())
   print ("------------------------------------------")
   print()
 end
@@ -75,7 +75,6 @@ function rfStorageLookup (storageName)
       print (storageName .. " found at address: "..address)
       print ("------------------------------------------")
       return address
-      break
     end
   end
   print ("Address lookup failed for component "..storageName)
@@ -83,6 +82,13 @@ function rfStorageLookup (storageName)
   print()
 end
 
+--------------------------------------------------------------------------------
+-- Resets the screen for a given mode
+--
+-- @param mode It could be "text" or "graphic".
+--
+-- @return The gpu API instance.
+--------------------------------------------------------------------------------
 function resetScreen (mode)
   local gpu = term.gpu()
   local maxW, maxH = gpu.maxResolution()
@@ -105,6 +111,13 @@ function resetScreen (mode)
   return gpu
 end
 
+--------------------------------------------------------------------------------
+-- Formats a number with proper MKS unit prefix
+--
+-- @params  number The number to format.
+--
+-- @return The formated number as string with unit prefix.
+--------------------------------------------------------------------------------
 function formatNumber(number)
   local output = string.format("%.3f", number)
   local unitVal = {1000000000000000, 1000000000000, 1000000000, 1000000, 1000}
@@ -120,6 +133,19 @@ function formatNumber(number)
   return output
 end
 
+--------------------------------------------------------------------------------
+-- Initializes the energy monitor program
+--
+-- @param storageName Component name to lookup;
+--         use draconic_rf_storage for DE EnergyCore.
+-- @param mode "text" or "graphics" used to properly initialize the screen.
+-- @param debug If true, prints additional info.
+-- @param initDelay Initial delay prior to main cycle start
+--
+-- @return  core An EnergyCore data structure instance.
+-- @return  term Instance of term API.
+-- @return  component Instance of component API.
+--------------------------------------------------------------------------------
 function init (storageName, mode, debug, initDelay)
   local gpu = resetScreen(mode)
 
@@ -132,8 +158,7 @@ function init (storageName, mode, debug, initDelay)
     print ("Couldn't find required component address, exiting...")
     return nil, term, component
   end
-  local proxy = component.proxy(address)
-  local core = EnergyCore.create(proxy)
+  local core = EnergyCore:create(address)
 
   if debug then
     printCoreValuesRaw(core)
