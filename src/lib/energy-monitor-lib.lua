@@ -1,6 +1,9 @@
 local component = require("component")
 local term = require ("term")
 
+--------------------------------------------------------------------------------
+-- Class to handle energy core values
+--------------------------------------------------------------------------------
 EnergyCore = {proxy = nil, lastTicks = 0, lastEnergyStored = 0, percent = 0}
 
 function EnergyCore:create(address)
@@ -48,10 +51,198 @@ function EnergyCore:getCurrentPercentStored()
   return self.proxy.getEnergyStored() / self.proxy.getMaxEnergyStored() * 100.0
 end
 
+--------------------------------------------------------------------------------
+-- Class to handle energy histogram
+--------------------------------------------------------------------------------
+Histogram = {
+  term = nil,
+  highPeak = 1,
+  lowPeak = -1,
+  history = {},
+  startX = 1,
+  startY = 1,
+  lastX = 1,
+  zeroHeight = 1
+}
+
+function Histogram:create (term, startX, startY)
+  o = {}
+  setmetatable (o, self)
+  self.__index = self
+
+  self.term = term
+  self.highPeak = 0
+  self.lowPeak = 0
+  self.history = {}
+  self.startX = startX
+  self.startY = startY
+  self.lastX = 1
+  self.zeroHeight = 1
+
+  return o
+end
+
+function Histogram:render (energyChange)
+  -- detect max size available to show history
+  local gpu = self.term.gpu()
+  local w, h = gpu.getResolution()
+  local maxW = w - self.startX
+  local maxH = h - self.startY - 3
+
+  -- add energy change and remove older values that doesn't fit
+  if self.lastX <= maxW then
+    self.history[self.lastX] = energyChange
+    self.lastX = self.lastX + 1
+  else
+    while self.lastX > maxW do
+      -- if screen res changed reduce the history to fit
+      table.remove(self.history, 1)
+      self.lastX = self.lastX - 1
+    end
+    self.history[self.lastX] = energyChange
+    self.lastX = self.lastX + 1
+  end
+
+  -- update peaks
+  self.lowPeak, self.highPeak = getLowHigh(self.history, self.lastX-1)
+
+  -- debugHistory (self.history, self.startX, self.lastX,
+  --    self.lowPeak, self.highPeak, self.term)
+
+  -- adjust histogram X axis
+  local energyHeight = self.highPeak + math.abs(self.lowPeak)
+
+  local axisPercent = self.highPeak / energyHeight
+  self.zeroHeight = math.floor (maxH * axisPercent)
+
+  -- print energy change
+  self.term.setCursor (self.startX, self.startY)
+  gpu.setBackground (0x000000)
+  if energyChange >= 0 then
+    gpu.setForeground(0x00FF00)
+  else
+    gpu.setForeground(0xFF00FF)
+  end
+  self.term.write (getRotatingBarChar() ..
+    " Energy Flow: " .. formatNumber(energyChange) .." RF/t")
+
+  -- print high peak and low peak
+  gpu.setForeground(0xBBBBBB)
+  local high = formatNumber (self.highPeak)
+  local low = formatNumber (self.lowPeak)
+  self.term.setCursor (w - string.len (high) - 11, self.startY)
+  self.term.write ("High: ".. high .. " RF/t")
+  self.term.setCursor (w - string.len (low) - 10, h )
+  self.term.write ("Low: ".. low .. " RF/t")
+
+  -- render histogram
+  gpu.fill (self.startX, self.startY + 1,
+    w - self.startX, h - self.startY - 1, " ")
+  gpu.setBackground(0xBBBBBB)
+  gpu.fill (self.startX, self.startY + self.zeroHeight+1, maxW, 1, " ")
+  for i=1, self.lastX-1 do
+    if self.history[i] > 0 then
+      local columnHeight = math.ceil (
+        (self.history[i] / self.highPeak) * self.zeroHeight)
+      gpu.setBackground (0x00BB00)
+      gpu.fill (self.startX+i-1, self.startY+(self.zeroHeight-columnHeight)+1,
+        1, columnHeight, " ")
+    elseif self.history[i] < 0 then
+      local columnHeight = math.ceil(
+        math.abs(self.history[i] / self.lowPeak) * (maxH - self.zeroHeight))
+      gpu.setBackground (0xBB0000)
+      gpu.fill (self.startX+i-1, self.startY+self.zeroHeight+2,
+        1, columnHeight, " ")
+    else
+      gpu.setForeground (0x000000)
+      gpu.setBackground(0xBBBBBB)
+      self.term.setCursor (self.startX+i-1, self.startY+self.zeroHeight+1)
+      self.term.write ("-")
+    end -- if
+  end -- for
+  gpu.setBackground(0x000000)
+end -- function Histogram:render
+
+--------------------------------------------------------------------------------
+-- Prints the application header
+--------------------------------------------------------------------------------
+function printHeader(term, x, y, name, maxX)
+  local gpu = term.gpu()
+  term.setCursor(x, y)
+  term.clearLine()
+  term.setCursor(x, y)
+  gpu.setForeground(0xFFFFFF)
+  term.write (name)
+  local credits = "[energy-monitor v0.1]"
+  term.setCursor (maxX - string.len(credits), y)
+  gpu.setForeground (0xBBBBBB)
+  term.write (credits)
+end
+
+--------------------------------------------------------------------------------
+-- Gets the next step of a rotating text bar (single character work indicator)
+--------------------------------------------------------------------------------
+local rotatingBar = {"-", "\\", "|", "/"}
+local rotatingBarIndex = 1
+function getRotatingBarChar ()
+  local currentChar = rotatingBar[rotatingBarIndex]
+  if rotatingBarIndex == 4 then
+    rotatingBarIndex = 1
+  else
+    rotatingBarIndex = rotatingBarIndex + 1
+  end
+  return currentChar
+end
+
+--------------------------------------------------------------------------------
+-- Debug function to print history values
+-- Use this instead of painting bars while for debugging
+--------------------------------------------------------------------------------
+function debugHistory (history, startX, lastX, lowPeak, highPeak, term)
+  local toShowBegin = 1
+  if lastX-1 > 10 then
+    toShowBegin = lastX - 10
+  end
+
+  term.setCursor (startX, 8)
+  term.write ("history size: ".. lastX .. " ".. lowPeak .. " - ".. highPeak)
+  local beginLine = 9
+  for i  = toShowBegin, lastX-1 do
+    term.setCursor (startX, beginLine)
+    beginLine = beginLine + 1
+    term.write(i .. " : ".. formatNumber(history[i]).." RF/t")
+  end
+end
+
+--------------------------------------------------------------------------------
+-- Gets the lowest and highest value from an array
+--------------------------------------------------------------------------------
+function getLowHigh (array, size)
+  local low, high = 0, 0
+  for i = 1, size do
+    if array[i] == nil then
+      break
+    end
+    if array[i] > high then
+      high = array[i]
+    end
+    if array[i] < low then
+      low = array[i]
+    end
+  end
+  return low, high
+end
+
+--------------------------------------------------------------------------------
+-- Gets the current tick
+--------------------------------------------------------------------------------
 function getCurrentTicks ()
   return ((os.time() * 1000) / 60 /60) - 6000
 end
 
+--------------------------------------------------------------------------------
+-- Prints the available components (debug info)
+--------------------------------------------------------------------------------
 function printComponentList ()
   print ("Available components: ")
   for k, v in component.list() do
@@ -61,6 +252,11 @@ function printComponentList ()
   print()
 end
 
+--------------------------------------------------------------------------------
+-- Prints raw energy core values (debug info)
+--
+-- @param core EnergyCore instance
+--------------------------------------------------------------------------------
 function printCoreValuesRaw (core)
   print ("MaxEnergyStored (RF raw) ".. core:getMaxEnergyStored())
   print ("    EnergyStore (RF raw) ".. core:getEnergyStored())
@@ -68,6 +264,13 @@ function printCoreValuesRaw (core)
   print()
 end
 
+--------------------------------------------------------------------------------
+-- Finds the address of a component
+--
+-- @param storageName Name of the component
+--
+-- @return The address of the component as string
+--------------------------------------------------------------------------------
 function rfStorageLookup (storageName)
   print ("Trying to lookup address for " .. storageName .. "...")
   for address, componentName in component.list() do
@@ -119,17 +322,25 @@ end
 -- @return The formated number as string with unit prefix.
 --------------------------------------------------------------------------------
 function formatNumber(number)
-  local output = string.format("%.3f", number)
+  local output = string.format("%.2f", number)
   local unitVal = {1000000000000000, 1000000000000, 1000000000, 1000000, 1000}
   local unit = {"P", "T", "G", "M", "k"}
+  local units = 5
 
-  for i = 1,4 do
-    if number >= unitVal[i] then
-      local x = number / unitVal[i]
-      output = string.format("%.3f", x) .. unit[i]
+  local toConvert = math.abs(number)
+  local sign = ""
+
+  for i = 1, units do
+    if toConvert >= unitVal[i] then
+      local x = toConvert / unitVal[i]
+      if number < 0 then
+        sign = "-"
+      end
+      output = sign .. string.format("%.2f", x) .. unit[i]
       break
     end
   end
+
   return output
 end
 
@@ -169,3 +380,5 @@ function init (storageName, mode, debug, initDelay)
 
   return core, term, component
 end
+
+return Histogram

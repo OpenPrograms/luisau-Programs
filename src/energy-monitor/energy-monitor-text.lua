@@ -26,20 +26,29 @@ local step = 1
 -- debug: print aditional debug info (usually at start).
 local debug = true
 
+-- name: Name of your Energy Core
+local name = "Energy Core"
+
 --------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
 local storageName = "draconic_rf_storage"
 local initDelay = 10
+local startX = 1
+local startY = 1
 
 --------------------------------------------------------------------------------
 -- Prints the current energy values
 --------------------------------------------------------------------------------
 function printEnergy (core, term)
-  term.setCursor(2, 1)
+  local gpu = term.gpu()
+  local width, height = gpu.getResolution()
+  printHeader (term, startX, startY, name, width)
+  term.setCursor(startX + 1, startY + 1)
   term.clearLine()
-  term.setCursor(2, 1)
-  term.write("Energy Core (RF): " ..
+  term.setCursor(startX + 1, startY + 1)
+  gpu.setForeground (0xFFFFFF)
+  term.write("         Energy : " ..
     formatNumber(core:getLastEnergyStored()) .. " / " ..
     formatNumber(core:getMaxEnergyStored()) .. "   (" ..
     string.format("%.2f", core:getLastPercentStored()) .. "%)")
@@ -49,17 +58,17 @@ end
 -- Prints the change on energy levels
 --------------------------------------------------------------------------------
 function printEnergyChange (change, term)
-  term.setCursor(2, 2)
+  term.setCursor(startX + 1, startY + 2)
   term.clearLine()
-  term.setCursor(2, 2)
+  term.setCursor(startX + 1, startY + 2)
   local gpu = term.gpu()
   if change >= 0 then
     gpu.setForeground(0x00FF00)
   else
     gpu.setForeground(0xFF00FF)
   end
-  term.write("    Energy Flow : " .. formatNumber(change) .." RF/t")
-  gpu.setForeground(0xFFFFFF)
+  term.write(getRotatingBarChar () .. 
+    "   Energy Flow : " .. formatNumber(change) .." RF/t")
 end
 
 --------------------------------------------------------------------------------

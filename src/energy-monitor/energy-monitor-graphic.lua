@@ -30,10 +30,16 @@ local debug = true
 local name = "Energy Core"
 
 --------------------------------------------------------------------------------
--- Constants
+-- Constants and Globals
 --------------------------------------------------------------------------------
 local storageName = "draconic_rf_storage"
 local initDelay = 1
+local startX = 1
+local startY = 1
+local gaugeHeight = 3
+local highPeak = 1
+local lowPeak = -1
+local lastX = 1
 
 --------------------------------------------------------------------------------
 -- Prints the current energy values
@@ -41,45 +47,47 @@ local initDelay = 1
 function printEnergy (core, term)
   local gpu = term.gpu()
   local w, h = gpu.getResolution()
-  gpu.fill(1,1,w,h, " ")
-  local startX = 1
-  local startY = 1
-  term.setCursor(startX, startY)
-  term.clearLine()
-  term.setCursor(startX, startY)
-  term.write (name .." [energy-monitor v0.1]")
+  gpu.fill(startX,startY,w,h, " ")
+
+  printHeader (term, startX, startY, name, w)
+
+  -- empty gauge
   gpu.setBackground(0xFF0000)
-  gpu.fill (startX, startY+1, w, 3, " ")
+  gpu.fill (startX, startY+1, w, gaugeHeight, " ")
   local currentWidth = math.ceil (core:getLastPercentStored() * w / 100)
 
+  -- stored gauge
   gpu.setBackground(0x00FF00)
-  gpu.fill (startX, startY+1, currentWidth, 3, " ")
+  gpu.fill (startX, startY+1, currentWidth, gaugeHeight, " ")
 
+  -- percent on moving gauge
   gpu.setForeground(0x000000)
-  if currentWidth < (w - 10) then
-    gpu.setBackground(0xFF0000)
-    term.setCursor(currentWidth+2, startY+2)
-  else
-    gpu.setBackground(0x00FF00)
-    term.setCursor(w - 16, startY+2)
+  local textX = currentWidth + 2
+  local textBackground = 0xFF0000
+  if currentWidth >= (w - 10) then
+    textBackground = 0x00FF00
+    textX = w - 16
   end
+  gpu.setBackground(textBackground)
+  term.setCursor(textX, math.ceil (gaugeHeight/2)+startY)
   term.write (string.format("%.2f", core:getLastPercentStored()) .. "%")
 
-  --  gpu.setBackground(0x00FF00)
-  --  gpu.fill (startX, startY+1, currentWidth, 3, " ")
-
-
+  -- current stored energy / max energy
   gpu.setBackground(0x000000)
   gpu.setForeground(0xFFFFFF)
-  term.setCursor (startX, startY+4)
+  term.setCursor (startX, startY + gaugeHeight + 1)
   term.write (formatNumber(core:getLastEnergyStored()) .. " / " ..
-    formatNumber(core:getMaxEnergyStored()))
+    formatNumber(core:getMaxEnergyStored()) .. "   ("..
+    string.format("%.2f", core:getLastPercentStored()) .. "%)")
 end
 
 --------------------------------------------------------------------------------
 -- Prints the change on energy levels
 --------------------------------------------------------------------------------
-function printEnergyChange (change, term)
+function printEnergyChange (change, term, histogram)
+
+  histogram:render(change)
+  --[[
   term.setCursor(2, 10)
   term.clearLine()
   term.setCursor(2, 10)
@@ -90,7 +98,7 @@ function printEnergyChange (change, term)
     gpu.setForeground(0xFF00FF)
   end
   term.write("    Energy Flow : " .. formatNumber(change) .." RF/t")
-  gpu.setForeground(0xFFFFFF)
+  gpu.setForeground(0xFFFFFF)]]
 end
 
 --------------------------------------------------------------------------------
@@ -99,6 +107,8 @@ end
 function run ()
   local core, term, component =
     init (storageName, "graphic", debug, initDelay)
+
+  local histogram = Histogram:create(term, startX, startY + gaugeHeight + 2)
 
   if core == nil then
     return 1
@@ -109,7 +119,7 @@ function run ()
   while true do
     local energyChange = core:getEnergyChange()
     printEnergy (core, term)
-    printEnergyChange (energyChange, term)
+    printEnergyChange (energyChange, term, histogram)
     os.sleep(step)
   end
 end
