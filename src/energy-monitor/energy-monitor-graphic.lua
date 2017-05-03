@@ -5,13 +5,13 @@
 -- Requirements:
 --    - Place an Adapter Block in contact with one of your Energy Pylons
 --    - Connect the Adapter Block through cables to the computer
---    - Only tested with tier 3 computers.
+--    - Only tested with tier 3 computers and screen.
 -- Install:
 --    oppm install energy-monitor
 -- Feedback:
 --    Contact me through Discord app: luisau#0826
 -- Repository:
---    https://github.com/lpenap/oc-energy-monitor
+--    https://github.com/lpenap/open-computers-programs
 --------------------------------------------------------------------------------
 
 require("energy-monitor-lib")
