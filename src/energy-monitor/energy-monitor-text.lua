@@ -29,6 +29,10 @@ local debug = true
 -- name: Name of your Energy Core
 local name = "Energy Core"
 
+-- threshold: Minimum threshold required to emit a redstone signal
+-- Valid values: 0.0 to 1.0 (decimal)
+local threshold = 0.75
+
 --------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
@@ -76,7 +80,7 @@ end
 --------------------------------------------------------------------------------
 function run ()
   local core, term, component =
-    init (storageName, "text", debug, initDelay)
+    init (storageName, "text", debug, initDelay, threshold)
 
   if core == nil then
     return 1

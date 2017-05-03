@@ -20,9 +20,15 @@ local term = require ("term")
 --------------------------------------------------------------------------------
 -- Class to handle energy core values
 --------------------------------------------------------------------------------
-EnergyCore = {proxy = nil, lastTicks = 0, lastEnergyStored = 0, percent = 0}
+EnergyCore = {
+  proxy = nil, 
+  lastTicks = 0, 
+  lastEnergyStored = 0, 
+  percent = 0,
+  threshold = 0.75
+}
 
-function EnergyCore:create(address)
+function EnergyCore:create(address, threshold)
   _core ={}
   setmetatable (_core, self)
   self.__index = self
@@ -30,6 +36,7 @@ function EnergyCore:create(address)
   self.lastTicks = getCurrentTicks ()
   self.lastEnergyStored = self.proxy.getEnergyStored()
   self.percent = self.lastEnergyStored / self.proxy.getMaxEnergyStored() * 100.0
+  self.threshold = threshold
   return _core
 end
 
@@ -367,13 +374,15 @@ end
 --         use draconic_rf_storage for DE EnergyCore.
 -- @param mode "text" or "graphics" used to properly initialize the screen.
 -- @param debug If true, prints additional info.
--- @param initDelay Initial delay prior to main cycle start
+-- @param initDelay Initial delay prior to main cycle start.
+-- @param threshold Minimum energy level required to start emiting a redstone
+--         signal.
 --
 -- @return  core An EnergyCore data structure instance.
 -- @return  term Instance of term API.
 -- @return  component Instance of component API.
 --------------------------------------------------------------------------------
-function init (storageName, mode, debug, initDelay)
+function init (storageName, mode, debug, initDelay, threshold)
   local gpu = resetScreen(mode)
 
   if debug then
@@ -385,7 +394,7 @@ function init (storageName, mode, debug, initDelay)
     print ("Couldn't find required component address, exiting...")
     return nil, term, component
   end
-  local core = EnergyCore:create(address)
+  local core = EnergyCore:create(address, threshold)
 
   if debug then
     printCoreValuesRaw(core)

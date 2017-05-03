@@ -29,6 +29,10 @@ local debug = true
 -- name: Name of your Energy Core
 local name = "Energy Core"
 
+-- threshold: Minimum threshold required to emit a redstone signal
+-- Valid values: 0.0 to 1.0 (decimal)
+local threshold = 0.75
+
 --------------------------------------------------------------------------------
 -- Constants and Globals
 --------------------------------------------------------------------------------
@@ -106,7 +110,7 @@ end
 --------------------------------------------------------------------------------
 function run ()
   local core, term, component =
-    init (storageName, "graphic", debug, initDelay)
+    init (storageName, "graphic", debug, initDelay, threshold)
 
   local histogram = Histogram:create(term, startX, startY + gaugeHeight + 2)
 
