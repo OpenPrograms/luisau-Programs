@@ -30,8 +30,8 @@ local debug = true
 local name = "Energy Core"
 
 -- threshold: Minimum threshold required to emit a redstone signal
--- Valid values: 0.0 to 1.0 (decimal)
-local threshold = 0.75
+-- Valid values: 1 to 100
+local threshold = 75
 
 --------------------------------------------------------------------------------
 -- Constants

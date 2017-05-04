@@ -30,8 +30,8 @@ local debug = true
 local name = "Energy Core"
 
 -- threshold: Minimum threshold required to emit a redstone signal
--- Valid values: 0.0 to 1.0 (decimal)
-local threshold = 0.75
+-- Valid values: 1 to 100
+local threshold = 75
 
 --------------------------------------------------------------------------------
 -- Constants and Globals
@@ -89,20 +89,7 @@ end
 -- Prints the change on energy levels
 --------------------------------------------------------------------------------
 function printEnergyChange (change, term, histogram)
-
   histogram:render(change)
-  --[[
-  term.setCursor(2, 10)
-  term.clearLine()
-  term.setCursor(2, 10)
-  local gpu = term.gpu()
-  if change >= 0 then
-    gpu.setForeground(0x00FF00)
-  else
-    gpu.setForeground(0xFF00FF)
-  end
-  term.write("    Energy Flow : " .. formatNumber(change) .." RF/t")
-  gpu.setForeground(0xFFFFFF)]]
 end
 
 --------------------------------------------------------------------------------
@@ -124,6 +111,7 @@ function run ()
     local energyChange = core:getEnergyChange()
     printEnergy (core, term)
     printEnergyChange (energyChange, term, histogram)
+    checkThreshold (term, core, startX)
     os.sleep(step)
   end
 end

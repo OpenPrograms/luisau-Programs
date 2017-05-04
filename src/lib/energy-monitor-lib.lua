@@ -21,11 +21,12 @@ local term = require ("term")
 -- Class to handle energy core values
 --------------------------------------------------------------------------------
 EnergyCore = {
-  proxy = nil, 
-  lastTicks = 0, 
-  lastEnergyStored = 0, 
+  proxy = nil,
+  lastTicks = 0,
+  lastEnergyStored = 0,
   percent = 0,
-  threshold = 0.75
+  threshold = 75,
+  signalActive = false
 }
 
 function EnergyCore:create(address, threshold)
@@ -37,6 +38,7 @@ function EnergyCore:create(address, threshold)
   self.lastEnergyStored = self.proxy.getEnergyStored()
   self.percent = self.lastEnergyStored / self.proxy.getMaxEnergyStored() * 100.0
   self.threshold = threshold
+  self.signalActive = false
   return _core
 end
 
@@ -72,6 +74,18 @@ end
 
 function EnergyCore:getCurrentPercentStored()
   return self.proxy.getEnergyStored() / self.proxy.getMaxEnergyStored() * 100.0
+end
+
+function EnergyCore:getThreshold()
+  return self.threshold
+end
+
+function EnergyCore:isSignalActive()
+  return self.signalActive
+end
+
+function EnergyCore:setSignal(active)
+  self.signalActive = active
 end
 
 --------------------------------------------------------------------------------
@@ -185,6 +199,48 @@ function Histogram:render (energyChange)
   end -- for
   gpu.setBackground(0x000000)
 end -- function Histogram:render
+
+--------------------------------------------------------------------------------
+-- Checks threshold and emits redstone signal
+--------------------------------------------------------------------------------
+function checkThreshold (term, core, startX)
+  local gpu = term.gpu()
+
+  if core:isSignalActive() then
+    -- turn off if we are at 100%
+    if core:getLastPercentStored() == 100 then
+      core:setSignal (false)
+    end
+  else
+    -- turn on if we reached below the threshold
+    if core:getLastPercentStored() < core:getThreshold() then
+      core:setSignal (true)
+    end
+  end
+
+  local thresholdText = "[ Signal Inactive ]"
+  local thresholdText2 = "set: "..core:getThreshold().. "%+"
+  gpu.setForeground (0xFF0000)
+  gpu.setBackground (0x000000)
+
+  if core:isSignalActive() then
+    thresholdText = "[ Signal Active ]"
+    gpu.setForeground (0x000000)
+    gpu.setBackground (0xFF0000)
+  end
+  
+  local w, h = gpu.getResolution()
+  term.setCursor (startX, h)
+  term.write (thresholdText)
+  
+  gpu.setForeground (0xBBBBBB)
+  gpu.setBackground (0x000000)
+  term.setCursor (startX + 20, h)
+  term.write (thresholdText2)
+end
+
+function emitRedstoneSignal (term, turnOn)
+end
 
 --------------------------------------------------------------------------------
 -- Prints the application header
