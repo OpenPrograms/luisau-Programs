@@ -112,13 +112,15 @@ function run ()
 
   term.clear()
   os.sleep (step)
-  while true do
+  while isRunning() do
     local energyChange = core:getEnergyChange()
     printEnergy (core, term)
     printEnergyChange (energyChange, term, histogram)
     checkThreshold (term, core, startX, side)
     os.sleep(step)
   end
+  
+  return 0
 end
 
 
@@ -128,4 +130,6 @@ end
 local exitCode = run ()
 if exitCode ~= 0 then
   print ("An internal error occurred. Exit code ".. exitCode)
+else
+  print ("Exiting... [exit code: "+exitCode+"]")
 end

@@ -6,7 +6,7 @@ a graphic version.
 - Place an Adapter Block in contact with one of your Energy Pylons
 - Connect the Adapter Block through cables to the computer
 - Only tested with tier 3 computers and screens (3 wide x 2 high)
-- A redstone card (tier 2) is required to emit a redstone signal when the threshold is reached (can be disabled in the config). This will work with redstone bundled cables only (has not been tested with vanilla redstone)
+- A redstone card (tier 2) is required to emit a redstone signal when the threshold is reached (can be disabled in the config). This will work with redstone bundled cables/conduits only (has not been tested with vanilla redstone). The signal is emitted from the bottom of the computer by default.
 
 ## Install
 ```

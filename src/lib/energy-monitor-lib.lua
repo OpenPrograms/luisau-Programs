@@ -17,9 +17,18 @@
 local component = require("component")
 local term = require ("term")
 local side = require ("sides")
-local redstone = component.redstone
 local color = require ("color")
+local event = require ("event")
 
+-- Menu array and index
+local menuOptions = {"x"}
+local menuIndexExit = 1
+
+local running = true
+
+-- Event registry
+event.listen("key_up", handleEvent)
+event.listen("interrupted", handleEvent)
 --------------------------------------------------------------------------------
 -- Class to handle energy core values
 --------------------------------------------------------------------------------
@@ -485,6 +494,46 @@ function init (storageName, mode, debug, initDelay, threshold)
   os.sleep (initDelay)
 
   return core, term, component
+end
+
+function isRunning()
+  return running
+end
+
+function cleanUp()
+  gpu.setForeground (0xFFFFFF)
+  gpu.setBackground (0x000000)
+end
+
+function handleEvent(eventID, ...)
+  if (eventID) then
+    energyLibEventHandlers[eventID](...)
+  end
+end
+
+function unknownEvent()
+-- do nothing if the event wasn't relevant
+end
+
+-- table that holds all event handlers
+-- in case no match can be found returns the dummy function unknownEvent
+local energyLibEventHandlers = setmetatable({},
+  {
+    __index = function()
+      return unknownEvent
+    end
+  })
+
+function energyLibHandlers.key_up(adress, char, code, playerName)
+  if (char == menuOptions[menuIndexExit]) then
+    running = false
+    cleanUp()
+  end
+end
+
+function energyLibHandlers.interrupted(adress, char, code, playerName)
+  running = false
+  cleanUp()
 end
 
 return Histogram
