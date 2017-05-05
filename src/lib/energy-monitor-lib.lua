@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- energy-monitor v0.1 by luisau
+-- energy-monitor v0.2 by luisau
 -- OpenComputers program to monitor a single Draconic Evolution Energy Core.
 --
 -- Requirements:
@@ -277,7 +277,7 @@ function printHeader(term, x, y, name, maxX)
   term.setCursor(x, y)
   gpu.setForeground(0xFFFFFF)
   term.write (name)
-  local credits = "[energy-monitor v0.1]"
+  local credits = "[energy-monitor v0.2]"
   term.setCursor (maxX - string.len(credits), y)
   gpu.setForeground (0xBBBBBB)
   term.write (credits)

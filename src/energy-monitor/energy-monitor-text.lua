@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- energy-monitor v0.1 by luisau
+-- energy-monitor v0.2 by luisau
 -- OpenComputers program to monitor a single Draconic Evolution Energy Core.
 --
 -- Requirements:
