@@ -14,10 +14,10 @@
 --    https://github.com/lpenap/open-computers-programs
 --------------------------------------------------------------------------------
 
-local component = require("component")
+local component = require ("component")
 local term = require ("term")
 local side = require ("sides")
-local color = require ("color")
+local color = require ("colors")
 local event = require ("event")
 
 -- Menu array and index
@@ -27,8 +27,6 @@ local menuIndexExit = 1
 local running = true
 
 -- Event registry
-event.listen("key_up", handleEvent)
-event.listen("interrupted", handleEvent)
 --------------------------------------------------------------------------------
 -- Class to handle energy core values
 --------------------------------------------------------------------------------
@@ -223,13 +221,13 @@ function checkThreshold (term, core, startX, side)
       -- turn off if we are at 100%
       if core:getLastPercentStored() == 100 then
         core:setSignal (false)
-        emitRedstoneSitnal (side, false)
+        emitRedstoneSignal (side, false)
       end
     else
       -- turn on if we reached below the threshold
       if core:getLastPercentStored() < core:getThreshold() then
         core:setSignal (true)
-        emitRedstoneSitnal (side, true)
+        emitRedstoneSignal (side, true)
       end
     end
 
@@ -524,16 +522,18 @@ local energyLibEventHandlers = setmetatable({},
     end
   })
 
-function energyLibHandlers.key_up(adress, char, code, playerName)
+function energyLibEventHandlers.key_up(adress, char, code, playerName)
   if (char == menuOptions[menuIndexExit]) then
     running = false
     cleanUp()
   end
 end
 
-function energyLibHandlers.interrupted(adress, char, code, playerName)
+function energyLibEventHandlers.interrupted(adress, char, code, playerName)
   running = false
   cleanUp()
 end
 
+-- event.listen ("key_up", handleEvent)
+-- event.listen ("interrupted", handleEvent)
 return Histogram
