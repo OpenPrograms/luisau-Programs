@@ -15,10 +15,19 @@
 --------------------------------------------------------------------------------
 
 require("energy-monitor-lib")
+local sides = require("sides")
 
 --------------------------------------------------------------------------------
 -- Configuration
 --------------------------------------------------------------------------------
+
+-- redstoneSide: side to emit a redstone signal when the threshold is reached
+-- nil to disable this feature (i.e.: local side = nil  )
+local side = sides.bottom
+
+-- threshold: Minimum threshold required to emit a redstone signal
+-- Valid values: 1 to 100
+local threshold = 75
 
 -- step: run interval in seconds.
 local step = 1
@@ -28,10 +37,6 @@ local debug = true
 
 -- name: Name of your Energy Core
 local name = "Energy Core"
-
--- threshold: Minimum threshold required to emit a redstone signal
--- Valid values: 1 to 100
-local threshold = 75
 
 --------------------------------------------------------------------------------
 -- Constants and Globals
@@ -111,7 +116,7 @@ function run ()
     local energyChange = core:getEnergyChange()
     printEnergy (core, term)
     printEnergyChange (energyChange, term, histogram)
-    checkThreshold (term, core, startX)
+    checkThreshold (term, core, startX, side)
     os.sleep(step)
   end
 end

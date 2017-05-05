@@ -16,6 +16,9 @@
 
 local component = require("component")
 local term = require ("term")
+local side = require ("sides")
+local redstone = component.redstone
+local color = require ("color")
 
 --------------------------------------------------------------------------------
 -- Class to handle energy core values
@@ -203,43 +206,58 @@ end -- function Histogram:render
 --------------------------------------------------------------------------------
 -- Checks threshold and emits redstone signal
 --------------------------------------------------------------------------------
-function checkThreshold (term, core, startX)
-  local gpu = term.gpu()
+function checkThreshold (term, core, startX, side)
+  if side ~= nil then
+    local gpu = term.gpu()
 
-  if core:isSignalActive() then
-    -- turn off if we are at 100%
-    if core:getLastPercentStored() == 100 then
-      core:setSignal (false)
+    if core:isSignalActive() then
+      -- turn off if we are at 100%
+      if core:getLastPercentStored() == 100 then
+        core:setSignal (false)
+        emitRedstoneSitnal (side, false)
+      end
+    else
+      -- turn on if we reached below the threshold
+      if core:getLastPercentStored() < core:getThreshold() then
+        core:setSignal (true)
+        emitRedstoneSitnal (side, true)
+      end
     end
-  else
-    -- turn on if we reached below the threshold
-    if core:getLastPercentStored() < core:getThreshold() then
-      core:setSignal (true)
+
+    local thresholdText = "[ Signal Inactive ]"
+    local thresholdText2 = "set: "..core:getThreshold().. "%+"
+    gpu.setForeground (0xFF0000)
+    gpu.setBackground (0x000000)
+
+    if core:isSignalActive() then
+      thresholdText = "[ Signal Active ]"
+      gpu.setForeground (0x000000)
+      gpu.setBackground (0xFF0000)
     end
-  end
 
-  local thresholdText = "[ Signal Inactive ]"
-  local thresholdText2 = "set: "..core:getThreshold().. "%+"
-  gpu.setForeground (0xFF0000)
-  gpu.setBackground (0x000000)
+    local w, h = gpu.getResolution()
+    term.setCursor (startX, h)
+    term.write (thresholdText)
 
-  if core:isSignalActive() then
-    thresholdText = "[ Signal Active ]"
-    gpu.setForeground (0x000000)
-    gpu.setBackground (0xFF0000)
-  end
-  
-  local w, h = gpu.getResolution()
-  term.setCursor (startX, h)
-  term.write (thresholdText)
-  
-  gpu.setForeground (0xBBBBBB)
-  gpu.setBackground (0x000000)
-  term.setCursor (startX + 20, h)
-  term.write (thresholdText2)
+    gpu.setForeground (0xBBBBBB)
+    gpu.setBackground (0x000000)
+    term.setCursor (startX + 20, h)
+    term.write (thresholdText2)
+  end -- if side ~= nil
 end
 
-function emitRedstoneSignal (term, turnOn)
+function emitRedstoneSignal (side, turnOn)
+  if side ~= nil then
+    local address = componentLookup("redstone", false)
+    if address ~= nil then
+      local proxy = component.proxy(address)
+      local value = 0
+      if turnOn then
+        value = 255
+      end
+      proxy.setBundledOutput (side, color.red, value)
+    end
+  end -- if side ~= nil
 end
 
 --------------------------------------------------------------------------------
@@ -350,18 +368,25 @@ end
 --
 -- @return The address of the component as string
 --------------------------------------------------------------------------------
-function rfStorageLookup (storageName)
-  print ("Trying to lookup address for " .. storageName .. "...")
-  for address, componentName in component.list() do
-    if componentName == storageName then
-      print (storageName .. " found at address: "..address)
-      print ("------------------------------------------")
+function componentLookup (componentName, debug)
+  if debug then
+    print ("Trying to lookup address for " .. componentName .. "...")
+  end
+  for address, name in component.list() do
+    if name == componentName then
+      if debug then
+        print (componentName .. " found at address: "..address)
+        print ("------------------------------------------")
+      end
       return address
     end
   end
-  print ("Address lookup failed for component "..storageName)
-  print ("------------------------------------------")
-  print()
+  if debug then
+    print ("Address lookup failed for component "..componentName)
+    print ("------------------------------------------")
+    print()
+  end
+  return nil
 end
 
 --------------------------------------------------------------------------------
@@ -445,7 +470,7 @@ function init (storageName, mode, debug, initDelay, threshold)
     printComponentList()
   end
 
-  local address = rfStorageLookup (storageName)
+  local address = componentLookup (storageName, true)
   if address == nil then
     print ("Couldn't find required component address, exiting...")
     return nil, term, component

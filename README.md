@@ -3,24 +3,5 @@ Collection of OpenComputers Lua programs.
 
 ## Programs
 
-### energy-monitor
-OpenComputers Lua program to monitor Draconic Energy Core. Comes with a text and
-a graphic version.
-
-##### Requirements
-- Place an Adapter Block in contact with one of your Energy Pylons
-- Connect the Adapter Block through cables to the computer
-- Only tested with tier 3 computers and screens (3 wide x 2 high)
-
-##### Install
-```
-oppm install energy-monitor
-```
-
-#### Executable
-```
-energy-monitor
-```
-
-#### Exit codes
-- **1** : Address for energy core not found, check your network cables and check that the EnergyPylon is connected to the computer through Adapter/Cables
+- **energy-monitor** : Program to monitor a Draconic Evolution Energy Core.
+- **lscomp** : Command line program to print all components and addresses.
