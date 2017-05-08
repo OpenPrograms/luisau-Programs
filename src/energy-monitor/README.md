@@ -2,7 +2,7 @@
 OpenComputers Lua program to monitor a Draconic Energy Core. Comes with a text and
 a graphic version.
 
-[![Graphic version](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-01.png)](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-01.png)
+[![Screenshot](screenshots/energy-monitor-01.png)](screenshots/energy-monitor-01.png)
 
 ## Features
 - Text and Graphic version:
