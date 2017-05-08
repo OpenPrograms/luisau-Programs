@@ -58,8 +58,8 @@ energy-monitor
 ## Screenshots
 
 ### Graphic Version
-[![Graphic version 02](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-02.png)](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-02.png)
-[![Graphic version 03](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-03.png)](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-03.png)
+[![Screenshot for Graphic Version](screenshots/energy-monitor-02.png)](screenshots/energy-monitor-02.png)
+[![Screenshot for Graphic Version](screenshots/energy-monitor-03.png)](screenshots/energy-monitor-03.png)
 
 ## Exit codes
 - **1** : Address for energy core not found, check your network cables and check that the EnergyPylon is connected to the computer through Adapter/Cables
