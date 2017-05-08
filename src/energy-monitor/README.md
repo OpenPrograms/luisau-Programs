@@ -2,7 +2,7 @@
 OpenComputers Lua program to monitor a Draconic Energy Core. Comes with a text and
 a graphic version.
 
-[![Graphic version](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-01.png)](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-01.png)
+[![Graphic version](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-01.png)](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-01.png)
 
 ## Features
 - Text and Graphic version:
@@ -58,8 +58,8 @@ energy-monitor
 ## Screenshots
 
 ### Graphic Version
-[![Graphic version 02](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-02.png)](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-02.png)
-[![Graphic version 03](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-03.png)](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-03.png)
+[![Graphic version 02](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-02.png)](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-02.png)
+[![Graphic version 03](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-03.png)](https://github.com/OpenPrograms/luisau-Programs/tree/develop/src/energy-monitor/screenshots/energy-monitor-03.png)
 
 ## Exit codes
 - **1** : Address for energy core not found, check your network cables and check that the EnergyPylon is connected to the computer through Adapter/Cables
