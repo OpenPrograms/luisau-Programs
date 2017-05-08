@@ -1,17 +1,25 @@
 --------------------------------------------------------------------------------
--- energy-monitor v0.2 by luisau
--- OpenComputers program to monitor a single Draconic Evolution Energy Core.
+-- energy-monitor v0.2 A program to monitor a Draconic Evolution Energy Core.
+-- Copyright (C) 2017 by Luisau  -  luisau.mc@gmail.com
+-- 
+--    This program is free software: you can redistribute it and/or modify
+--    it under the terms of the GNU General Public License as published by
+--    the Free Software Foundation, either version 3 of the License, or
+--    (at your option) any later version.
+--    
+--    This program is distributed in the hope that it will be useful,
+--    but WITHOUT ANY WARRANTY; without even the implied warranty of
+--    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--    GNU General Public License for more details.
 --
--- Requirements:
---    - Place an Adapter Block in contact with one of your Energy Pylons
---    - Connect the Adapter Block through cables to the computer
---    - Only tested with tier 3 computers and screen.
--- Install:
---    oppm install energy-monitor
--- Feedback:
---    Contact me through Discord app: luisau#0826
--- Repository:
---    https://github.com/lpenap/open-computers-programs
+--    You should have received a copy of the GNU General Public License
+--    along with this program.  If not, see <http://www.gnu.org/licenses/>
+--
+-- For Documentation and License see
+--  /usr/share/doc/energy-monitor/README.md
+--  
+-- Repo URL:
+-- https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor
 --------------------------------------------------------------------------------
 
 require("energy-monitor-lib")

@@ -1,6 +1,22 @@
 # energy-monitor
-OpenComputers Lua program to monitor Draconic Energy Core. Comes with a text and
+OpenComputers Lua program to monitor a Draconic Energy Core. Comes with a text and
 a graphic version.
+
+[![Graphic version](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-01.png)](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-01.png)
+
+## Features
+- Text and Graphic version:
+  - Current energy stored / Max energy capacity.
+  - Percent indicator of stored energy.
+  - Net energy flow of the core (positive or negative).
+  - Supports for big amounts (format numbers up to Peta RF for easy reading).
+  - Threshold configuration for a redstone signal output.
+  - Signal output indicator.
+- Graphic version:
+  - Current energy stored progress bar indicator.
+  - Energy flow histogram: Visually show energy flow values for a histogram. The amount of values stored is adjusted according to screen resolution. 
+  - Automatic resize of histogram to show proportional values of positive and negative flow.
+  - Low / High Peaks indicators
 
 ## Requirements
 - Place an Adapter Block in contact with one of your Energy Pylons
@@ -38,6 +54,12 @@ local name = "Energy Core"
 ```
 energy-monitor
 ```
+
+## Screenshots
+
+### Graphic Version
+[![Graphic version 02](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-02.png)](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-02.png)
+[![Graphic version 03](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-03.png)](https://github.com/OpenPrograms/luisau-Programs/tree/master/src/energy-monitor/screenshots/energy-monitor-03.png)
 
 ## Exit codes
 - **1** : Address for energy core not found, check your network cables and check that the EnergyPylon is connected to the computer through Adapter/Cables
