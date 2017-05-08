@@ -1,5 +1,5 @@
-# open-computer-programs
-Collection of OpenComputers Lua programs.
+# luisau-Programs
+Collection of OpenComputers Lua programs by Luisau.
 
 ## Programs
 
